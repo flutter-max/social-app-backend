@@ -36,6 +36,10 @@ export class UserService {
     return this.userModel.findOne({ phoneNumber: phoneNumber });
   }
 
+  async findById(id: string): Promise<User | undefined> {
+    return this.userModel.findOne({ id: id });
+  }
+
   async getUserFollowers(id: string): Promise<User[]> {
     const docs: Relation[] = await this.relationModel
       .find({ following: id })
@@ -105,5 +109,16 @@ export class UserService {
       _id: { $ne: searchUsersDto.userId },
       ...filter,
     });
+  }
+
+  async blockUser(userId: string, personId: string) {
+    await this.userModel.find({
+      id: userId,
+      $push: { blockedUsers: personId },
+    });
+  }
+
+  async unBlockUser(userId: string, personId: string) {
+    await this.userModel.find({ id: userId, $pop: { blockedUsers: personId } });
   }
 }

@@ -9,15 +9,14 @@ import {
   Query,
   Req,
   Res,
+  Request,
   UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { CreatePostDto } from './dtos/create_post.dto';
 import { PostService } from './post.service';
 import { SearchPostsDto } from './dtos/search_posts.dto';
-import { AuthGuard } from '@nestjs/passport';
 
-@UseGuards(AuthGuard)
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
@@ -31,6 +30,7 @@ export class PostController {
       res.status(err.status).json(err.response);
     }
   }
+
 
   @Get(':id')
   async getPostsById(
@@ -85,15 +85,15 @@ export class PostController {
     }
   }
 
-  
   @Post('like/:id')
   async likePost(
-    @Req() req: Request,
+    @Request() req,
     @Res() res: Response,
-    @Param('id') postId: string,
+    @Param('postId') postId: string,
   ): Promise<object> {
+    console.log(req.body);
     try {
-      await this.postService.likePost(postId, '5');
+      await this.postService.likePost(postId, req.user.id);
       return res.status(HttpStatus.OK).json({ message: 'success', body: '' });
     } catch (err) {
       return res.status(err.status).json(err.response);

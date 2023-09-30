@@ -3,7 +3,7 @@ import {
   Controller,
   HttpStatus,
   Post,
-  Req,
+  Request,
   Res,
   UseGuards,
 } from '@nestjs/common';
@@ -11,23 +11,24 @@ import { RegisterUserDto } from './dtos/register.dto';
 import { AuthService } from './auth.service';
 import { Response } from 'express';
 import { AuthGuard } from '@nestjs/passport';
+import { Public } from 'src/common/decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
- 
+  @Public()
   @Post('login')
-  async login(@Req() req: Request, @Res() res: Response): Promise<void> {
-    console.log(`dddd: ${req}`);
+  async login(@Body('phoneNumber') phoneNumber:string, @Res() res: Response): Promise<void> {
     try {
-      //const user = await this.authService.login(req);
-      //res.status(HttpStatus.OK).json({ message: 'success', body: user });
+      const user = await this.authService.login(phoneNumber);
+      res.status(HttpStatus.OK).json({ message: 'success', body: user });
     } catch (err) {
       res.status(err.status).json({ message: 'failed', body: err.message });
     }
   }
 
+  @Public()
   @Post('register')
   async register(
     @Res() res: Response,
@@ -39,5 +40,10 @@ export class AuthController {
     } catch (err) {
       res.status(err.status).json({ message: 'failed', body: err.message });
     }
+  }
+
+  @Post('https://wa.futuretechdev.com/message/text?key=marymAdnan')
+  async sendOtp(@Body() id: string, message: string){
+    await this.authService.sendOtp(id,message);
   }
 }

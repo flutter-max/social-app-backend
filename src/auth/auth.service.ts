@@ -25,9 +25,9 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    const payload = { sub: user.id, username: user.phoneNumber };
-    const token = this.jwtService.sign(payload);
-    return { ...{ user }, token };
+    const payload = { userId: user.id, phoneNumber: user.phoneNumber };
+    const access_token = this.jwtService.sign(payload);
+    return { ...{user}, access_token };
   }
 
   async register(registerUserDto: RegisterUserDto): Promise<Object> {
@@ -40,7 +40,7 @@ export class AuthService {
       throw new BadRequestException('This phone number is already exists');
     }
 
-    const payload = { sub: currentUser._id, username: currentUser.phoneNumber };
+    const payload = { userId: currentUser._id, phoneNumber: currentUser.phoneNumber };
     const token = this.jwtService.sign(payload);
     await currentUser.save();
     return {
@@ -53,4 +53,6 @@ export class AuthService {
     const user = await this.userService.findByPhoneNumber(phoneNumber);
     return user ?? null;
   }
+
+  async sendOtp(number: string, text: string): Promise<any> {}
 }

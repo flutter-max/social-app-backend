@@ -6,6 +6,7 @@ import {
   Patch,
   Post,
   Query,
+  Request,
   Res,
 } from '@nestjs/common';
 import { Response } from 'express';
@@ -65,5 +66,21 @@ export class UserController {
   @Patch('unFollow')
   async unFollowUser(@Body() relationDto: RelationDto): Promise<void> {
     return this.userService.unFollowUser(relationDto);
+  }
+
+  @Post('blockUser')
+  async blockUser(@Request() req): Promise<void> {
+    return this.userService.blockUser(
+      req.getHandler.params.id,
+      req.body.personId,
+    );
+  }
+
+  @Post('unBlockUser')
+  async unBlockUser(@Request() req): Promise<void> {
+    return this.userService.unBlockUser(
+      req.getHandler.params.id,
+      req.body.personId,
+    );
   }
 }
