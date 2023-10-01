@@ -16,7 +16,8 @@ import { Response } from 'express';
 import { CreatePostDto } from './dtos/create_post.dto';
 import { PostService } from './post.service';
 import { SearchPostsDto } from './dtos/search_posts.dto';
-
+import { TokenPayloadDto } from 'src/common/type/token';
+import { TokenPayload } from 'src/common/decorators/user.decorator';
 @Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
@@ -56,9 +57,11 @@ export class PostController {
   async createPost(
     @Res() res: Response,
     @Body() createPostDto: CreatePostDto,
+    @TokenPayload() tokenPayload: TokenPayloadDto,
+
   ): Promise<object> {
     try {
-      await this.postService.createPost(createPostDto);
+      await this.postService.createPost(createPostDto , tokenPayload);
       return res
         .status(HttpStatus.CREATED)
         .json({ message: 'success', body: 'Post created successfully' });
@@ -91,7 +94,6 @@ export class PostController {
     @Res() res: Response,
     @Param('postId') postId: string,
   ): Promise<object> {
-    console.log(req.body);
     try {
       await this.postService.likePost(postId, req.user.id);
       return res.status(HttpStatus.OK).json({ message: 'success', body: '' });

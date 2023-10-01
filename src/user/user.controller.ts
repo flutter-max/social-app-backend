@@ -15,6 +15,8 @@ import { UserService } from './user.service';
 import { RelationDto } from './dtos/relation.dto';
 import { SearchUsersDto } from './dtos/search_users.dto';
 import { CreateUserDto } from './dtos/create_user.dto';
+import { TokenPayload } from 'src/common/decorators/user.decorator';
+import { TokenPayloadDto } from 'src/common/type/token';
 
 @Controller('users')
 export class UserController {
@@ -69,10 +71,14 @@ export class UserController {
   }
 
   @Post('blockUser')
-  async blockUser(@Request() req): Promise<void> {
+  async blockUser(
+    @Request() req,
+    @TokenPayload() payload: TokenPayloadDto,
+    @Query('id') blockedUserId: string,
+    ) {
     return this.userService.blockUser(
-      req.getHandler.params.id,
-      req.body.personId,
+      payload.userId,
+      blockedUserId,
     );
   }
 

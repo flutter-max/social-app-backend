@@ -1,9 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Types } from 'mongoose';
 
 @Schema({ versionKey: false })
 export class User {
   @Prop()
-  id: string;
+  _id: Types.ObjectId;
 
   @Prop()
   phoneNumber: string;
