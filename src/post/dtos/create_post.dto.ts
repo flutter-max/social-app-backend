@@ -1,8 +1,6 @@
 import { IsArray, IsOptional, IsString } from 'class-validator';
 
 export class CreatePostDto {
-  @IsString()
-  readonly userId: string;
   
   @IsString()
   @IsOptional()

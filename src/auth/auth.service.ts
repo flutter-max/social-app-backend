@@ -7,7 +7,7 @@ import { RegisterUserDto } from './dtos/register.dto';
 import { JwtService } from '@nestjs/jwt';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from 'src/user/entities/user.entity';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { UserService } from 'src/user/user.service';
 
 @Injectable()
@@ -24,27 +24,28 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
-    const payload = { userId: user.id, phoneNumber: user.phoneNumber };
+    const payload = { userId: user._id, phoneNumber: user.phoneNumber };
     const access_token = this.jwtService.sign(payload);
-    return { ...{user}, access_token };
+    return { ...{ user }, access_token };
   }
 
-  async register(registerUserDto: RegisterUserDto): Promise<Object> {
-    const currentUser = new this.userModel(registerUserDto);
+  async register(registerUserDto: RegisterUserDto) {
     const user = await this.userService.findByPhoneNumber(
-      currentUser.phoneNumber,
+      registerUserDto.phoneNumber,
     );
 
     if (user) {
       throw new BadRequestException('This phone number is already exists');
     }
+    const newUser = await new this.userModel({
+      _id: new Types.ObjectId(),
+      ...registerUserDto,
+    }).save();
 
-    const payload = { userId: currentUser._id, phoneNumber: currentUser.phoneNumber };
+    const payload = { userId: newUser._id, phoneNumber: newUser.phoneNumber };
     const token = this.jwtService.sign(payload);
-    await currentUser.save();
     return {
-      ...currentUser.toJSON(),
+      ...newUser.toObject(),
       token,
     };
   }

@@ -7,6 +7,7 @@ import { RelationDto } from './dtos/relation.dto';
 import { Post } from 'src/post/entities/post.entity';
 import { SearchUsersDto } from './dtos/search_users.dto';
 import { CreateUserDto } from './dtos/create_user.dto';
+import { ObjectId } from 'mongodb';
 
 @Injectable()
 export class UserService {
@@ -112,10 +113,13 @@ export class UserService {
   }
 
   async blockUser(userId: string, personId: string) {
-    await this.userModel.find({
-      id: userId,
-      $push: { blockedUsers: personId },
-    });
+      //push personId to blockedUsers array but without duplication
+   return await this.userModel.findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      { $addToSet: { blockedUsers: personId } },
+    );
+
+      
   }
 
   async unBlockUser(userId: string, personId: string) {

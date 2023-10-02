@@ -5,6 +5,7 @@ import { Model } from 'mongoose';
 import { Post } from './entities/post.entity';
 import { User } from 'src/user/entities/user.entity';
 import { SearchPostsDto } from './dtos/search_posts.dto';
+import { TokenPayloadDto } from 'src/common/type/token';
 
 @Injectable()
 export class PostService {
@@ -21,7 +22,6 @@ export class PostService {
   }
 
   async getPostsById(id: string): Promise<Post[]> {
-    console.log(id);
     const posts = await this.postModel.find({ userId: id });
     if (!posts) {
       return [];
@@ -29,8 +29,15 @@ export class PostService {
     return posts;
   }
 
-  async createPost(createPostDto: CreatePostDto): Promise<void> {
-    const newPost = new this.postModel(createPostDto);
+  async createPost(
+    createPostDto: CreatePostDto,
+    tokenPayload: TokenPayloadDto,
+    ): Promise<void> {
+      
+    const newPost = new this.postModel({
+      ...createPostDto,
+      userId: tokenPayload.userId,
+    });
     newPost.save();
   }
 
